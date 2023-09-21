@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Heading, Text, Image, Button, Modal, ModalOverlay,ModalContent, ModalHeader,ModalBody, ModalFooter, useDisclosure, useToast, ToastContainer } from '@chakra-ui/react';
-import { useParams, useHistory } from 'react-router-dom';
-import { EditForm } from '../components/EditForm'; 
+import { Heading, Text, Image, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, useToast } from '@chakra-ui/react';
+import { useParams } from 'react-router-dom';
+import { EditForm } from '../components/EditForm';
 import eventsData from '/events.json';
 
 export const EventPage = () => {
@@ -11,13 +11,12 @@ export const EventPage = () => {
   );
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
-  const history = useHistory();
 
   useEffect(() => {
     // Function to fetch event data based on the eventId
     async function fetchEvent() {
       try {
-        const response = await fetch(`http://localhost:5173/api/events/${eventId}`);
+        const response = await fetch(`/events.json/${eventId}`);
         if (!response.ok) {
           throw new Error('Failed to fetch event from the server');
         }
@@ -27,10 +26,10 @@ export const EventPage = () => {
         console.error(error);
       }
     }
-  
+
     fetchEvent();
   }, [eventId]);
-  
+
   // Function to handle opening the edit modal
   const handleEdit = () => {
     onOpen();
@@ -38,7 +37,7 @@ export const EventPage = () => {
 
   // Function to send an update request to the server
   const updateEvent = async (updatedEvent) => {
-    const response = await fetch(`http://localhost:5173/api/events/${updatedEvent.id}`, {
+    const response = await fetch(`/events.json/${event.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -86,6 +85,7 @@ export const EventPage = () => {
             duration: 3000,
             isClosable: true,
           });
+          // Redirect to the homepage or any other appropriate page
           history.push('/');
         })
         .catch(() => {
@@ -101,7 +101,7 @@ export const EventPage = () => {
 
   // Function to send a delete request to the server
   const deleteEvent = async (eventId) => {
-    const response = await fetch(`http://localhost:5173/api/events/${eventId}`, {
+    const response = await fetch(`/events.json/${eventId}`, {
       method: 'DELETE',
     });
 
@@ -111,39 +111,44 @@ export const EventPage = () => {
   };
 
   return (
-    <div>
-          {/* Display event details */}
-      <Image src={event.image} alt={event.title} />
-      <Heading>{event.title}</Heading>
-      <Text>Description: {event.description}</Text>
-      <Text>Start Time: {event.startTime}</Text>
-      <Text>End Time: {event.endTime}</Text>
-      <Text>Categories: {event.categoryIds.join(', ')}</Text>
-      <Text>Created By: {eventsData.users.find((user) => user.id === event.createdBy).name}</Text>
-      <Image src={eventsData.users.find((user) => user.id === event.createdBy).image} alt="Creator" />
-      
-        {/* Buttons for editing and deleting */}
-      <Button onClick={handleEdit}>Edit</Button>
+    <div style={{ textAlign: 'center' }}>
+      {/* Display event details */}
+      <Heading mb="4">{event.title}</Heading>
+      <Image src={event.image} alt="Event"         
+      style={{ width: '50%', borderRadius: '10px', margin: '10px auto' }}
+      />
+      <Text> <strong>Description:</strong> {event.description}</Text>
+      <Text><strong>Start Time:</strong> {new Date(event.startTime).toLocaleString()}</Text>  
+      <Text><strong>End Time:</strong>  {new Date(event.endTime).toLocaleString()}</Text>
+      <Text><strong>Categories:</strong> {event.categoryIds.map((categoryId) =>
+        eventsData.categories.find((category) => category.id === categoryId).name
+      ).join(', ')}</Text>
+      <Text><strong>Created By:</strong> {eventsData.users.find((user) => user.id === event.createdBy).name}</Text>
+      <Image src={eventsData.users.find((user) => user.id === event.createdBy).image} alt="Creator" 
+      style={{ width: '30%', borderRadius: '50%', margin: '10px auto' }}
+      />
+
+      {/* Buttons for editing and deleting */}
+      <Button style={{ marginRight: '10px' }} onClick={handleEdit}>Edit</Button>
       <Button onClick={handleDelete}>Delete</Button>
-      
-        {/* Modal for editing event details */}
+
+      {/* Modal for editing event details */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Edit Event</ModalHeader>
+          <ModalHeader className="edit-form-title">Edit Event</ModalHeader>
           <ModalBody>
-              {/* Include the EditForm component */}
+            {/* Include the EditForm component */}
             <EditForm event={event} onSave={handleSave} onCancel={onClose} />
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" onClick={() => handleSave(event)}>
+            <Button colorScheme="blue" bg="rgb(7, 79, 106)" style={{ marginRight: '10px' }}  onClick={() => handleSave(event)}>
               Save
             </Button>
             <Button onClick={onClose}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <ToastContainer />
     </div>
   );
 };
