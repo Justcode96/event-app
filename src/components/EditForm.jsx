@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 export const EditForm = ({ event, onSave, onCancel }) => {
   const [editedEvent, setEditedEvent] = useState({ ...event });
 
+  // Update the editedEvent state when the event prop changes
   useEffect(() => {
     setEditedEvent({ ...event });
   }, [event]);
@@ -22,25 +23,26 @@ export const EditForm = ({ event, onSave, onCancel }) => {
     onSave(editedEvent);
   };
 
+   // Function to handle the cancel button click
+   const handleCancelClick = () => {
+    onCancel();
+  };
+
   return (
-    <form onSubmit={handleSaveClick}>
+    <form onSubmit={handleSaveClick} className="edit-form">
       <label>
-        Title:
-        <input
+        Title: 
+        <input 
           type="text"
           name="title"
           value={editedEvent.title}
           onChange={handleInputChange}
         />
-      </label>
-
-     {/* Save button triggers the handleSaveClick function */}
-      <button type="submit">Save</button>
-
-      {/* Cancel button triggers the onCancel prop function */}
-      <button type="button" onClick={onCancel}>
-        Cancel
-      </button>
+       </label>
+      <div>
+        <button type="submit" onClick={handleSaveClick}></button>
+        <button type="button" onClick={handleCancelClick}></button>
+      </div>
     </form>
   );
 };
