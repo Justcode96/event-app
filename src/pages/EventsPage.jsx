@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Input, Select, VStack, Text } from '@chakra-ui/react'; 
+import { Heading, Button, Input, Select, Text } from '@chakra-ui/react'; 
 
 const EventsPage = () => {
   // State variables for managing events, new event input, success message, search term, selected category, and categories.
@@ -16,45 +16,32 @@ const EventsPage = () => {
 
   const [successMessage, setSuccessMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('null');
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [categories, setCategories] = useState([]); 
 
   // useEffect to fetch events and categories from the server 
   useEffect(() => {
-    async function fetchEventsFromServer() {
+    async function fetchDataFromServer() {
       try {
-        const response = await fetch('http://localhost:5173/api/events');
+        const response = await fetch('/events.json');
         if (!response.ok) {
-          throw new Error('Failed to fetch events from the server');
+          throw new Error('Failed to fetch data from the server');
         }
         const data = await response.json();
-        setEvents(data);
+        setEvents(data.events);
+        setCategories(data.categories);
       } catch (error) {
         console.error(error);
       }
     }
-
-    async function fetchCategoriesFromServer() {
-      try {
-        const response = await fetch('http://localhost:5173/api/categories');
-        if (!response.ok) {
-          throw new Error('Failed to fetch categories from the server');
-        }
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    fetchEventsFromServer();
-    fetchCategoriesFromServer(); 
+    
+    fetchDataFromServer();
   }, []);
-
+    
   // Function to add a new event to the server.
   const addEvent = async () => {
     try {
-      const response = await fetch('http://localhost:5173/api/events', {
+      const response = await fetch('/events.json', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,52 +71,54 @@ const EventsPage = () => {
 
   // Filter events based on search term and selected category.
   const filteredEvents = events.filter((event) => {
-    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      !selectedCategory || event.categories.includes(selectedCategory);
+  const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase());
+  const matchesCategory =
+  !selectedCategory || event.categories.includes(selectedCategory);
     return matchesSearch && matchesCategory;
   });
 
   return (
-    <div>
+    <div style={{ textAlign: 'center' }}>
       <h1>Events Page</h1>
 
       {/* Form to add a new event */}
-      <VStack spacing={4} align="flex-start">
-        <h2>Add New Event</h2>
-        <Input
+        <h2><strong>Add New Event</strong></h2>
+        <Input 
           type="text"
           placeholder="Event Title"
           value={newEvent.title}
           onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+          style={{ width: '200px', margin: '10px', padding: '10px' }} 
         />
-        <Input
+        <Input  
           type="text"
           placeholder="Description"
           value={newEvent.description}
           onChange={(e) =>
             setNewEvent({ ...newEvent, description: e.target.value })
           }
+          style={{ width: '200px', padding: '10px' }}
         />
-        <Button colorScheme="blue" onClick={addEvent}>
+        <Button colorScheme="blue" bg="rgb(7, 79, 106)" borderRadius="5px"
+        ml='4' mt="8"  mb="10" onClick={addEvent}>
           Add Event
         </Button>
-        <Text color="green">{successMessage}</Text>
-      </VStack>
+        <Text color="green" mb="10">{successMessage}</Text>
 
       {/* Event Filters */}
-      <VStack spacing={4} align="flex-start">
-        <h2>Filter and Search</h2>
-        <Input
+        <h2><strong>Filter and Search</strong></h2>
+        <Input  mt="4" 
           type="text"
           placeholder="Search by Event Name"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ width: '400px', padding: '10px' }}
         />
-        <Select
+        <Select  mt="4"   
           placeholder="Filter by Category"
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
+          style={{ width: '400px', padding: '10px' }}
         >
           <option value="">All Categories</option>
           {categories.map((category) => (
@@ -138,28 +127,29 @@ const EventsPage = () => {
             </option>
           ))}
         </Select>
-      </VStack>
 
       {/* Display filtered events */}
       <div>
         {filteredEvents.map((event) => (
           <div key={event.id}>
-            <Link to={`/events/${event.id}`}>
-              <h2>{event.title}</h2>
+            <Link to={`/event/${event.id}`}>
+              <Heading mt="10" mb="4">{event.title}</Heading>
             </Link>
-            <p>{event.description}</p>
-            <img src={event.image} alt={event.title} /> 
-            <p>Start Time: {event.startTime}</p> 
-            <p>End Time: {event.endTime}</p> 
-            <p>
-              Categories:{' '}
+            <img src={event.image} alt={event.title} 
+            style={{ width: '60%', borderRadius: '10px', margin: '10px auto' }}
+            /> 
+            <Text><strong>Description:</strong> {event.description}</Text>
+            <Text><strong>Start Time:</strong> {event.startTime}</Text> 
+            <Text><strong>End Time:</strong> {event.endTime}</Text> 
+            <Text><strong>Categories:</strong>
+              {' '}
               {event.categoryIds
                 .map((categoryId) => {
                   const category = categories.find((cat) => cat.id === categoryId);
                   return category ? category.name : '';
                 })
                 .join(', ')}
-            </p>{' '}
+            </Text>{' '}
           </div>
         ))}
       </div>
