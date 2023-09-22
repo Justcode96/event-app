@@ -73,7 +73,7 @@ const EventsPage = () => {
   const filteredEvents = events.filter((event) => {
   const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase());
   const matchesCategory =
-  !selectedCategory || event.categories.includes(selectedCategory);
+  !selectedCategory || event.categoryIds.includes(parseInt(selectedCategory));
     return matchesSearch && matchesCategory;
   });
 
