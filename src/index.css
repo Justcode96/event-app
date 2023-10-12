@@ -37,7 +37,6 @@ h2 {
  
 /* Style for the edit form */
 .edit-form { 
-  color: white; 
   background-color: rgb(7, 79, 106);
   border-radius: 5PX;
   padding: 20px; 
@@ -45,4 +44,30 @@ h2 {
 
 .edit-form-title {
   color: rgb(7, 79, 106);
+}
+
+.label-text {
+  color: white;
+  font-weight: 400;
+}
+
+.custom-label {
+  margin: 15px;
+}
+
+.previous {
+  background-color: white;
+  color:  rgb(7, 79, 106);
+  padding: 8px 16px;
+  margin-bottom: 20%;
+}
+
+/* Style for anchor tags on hover */
+a:hover {
+  background-color: rgba(161, 155, 155, 0.201);
+  color: rgb(7, 79, 106);
+}
+
+.round {
+  border-radius: 50%;
 }
