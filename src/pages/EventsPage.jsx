@@ -53,6 +53,11 @@ const EventsPage = () => {
         throw new Error('Failed to add event to the server');
       }
 
+// Get the newly added event from the server response
+const addedEvent = await response.json();
+
+setEvents((prevEvents) => [...prevEvents, addedEvent]);
+
       // Reset the newEvent input and set a success message.
       setNewEvent({
         title: '',
@@ -63,6 +68,9 @@ const EventsPage = () => {
         categories: [],
       });
       setSuccessMessage('Event added successfully!');
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 5000);
     } catch (error) {
       console.error(error);
       setSuccessMessage('Failed to add event. Please try again.');
@@ -70,12 +78,15 @@ const EventsPage = () => {
   };
 
   // Filter events based on search term and selected category.
-  const filteredEvents = events.filter((event) => {
-  const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase());
+const filteredEvents = events.filter((event) => {
+  const matchesSearch =
+    event.title &&
+    event.title.toLowerCase().includes(searchTerm.toLowerCase());
   const matchesCategory =
-  !selectedCategory || event.categoryIds.includes(parseInt(selectedCategory));
-    return matchesSearch && matchesCategory;
-  });
+    !selectedCategory || (event.categoryIds && event.categoryIds.includes(parseInt(selectedCategory)));
+  return matchesSearch && matchesCategory;
+});
+
 
   return (
     <div style={{ textAlign: 'center' }}>
@@ -99,6 +110,7 @@ const EventsPage = () => {
           }
           style={{ width: '200px', padding: '10px' }}
         />
+        
         <Button colorScheme="blue" bg="rgb(7, 79, 106)" borderRadius="5px"
         ml='4' mt="8"  mb="10" onClick={addEvent}>
           Add Event
@@ -135,12 +147,18 @@ const EventsPage = () => {
             <Link to={`/event/${event.id}`}>
               <Heading mt="10" mb="4">{event.title}</Heading>
             </Link>
+            <Link to={`/event/${event.id}`}>
             <img src={event.image} alt={event.title} 
             style={{ width: '60%', borderRadius: '10px', margin: '10px auto' }}
             /> 
-            <Text><strong>Description:</strong> {event.description}</Text>
-            <Text><strong>Start Time:</strong> {event.startTime}</Text> 
-            <Text><strong>End Time:</strong> {event.endTime}</Text> 
+            </Link> 
+            <Link to={`/event/${event.id}`}>
+            <Text><strong>Description:</strong> {event.description}</Text></Link>
+            <Link to={`/event/${event.id}`}>
+            <Text><strong>Start Time:</strong> {event.startTime}</Text></Link>
+            <Link to={`/event/${event.id}`}>
+            <Text><strong>End Time:</strong> {event.endTime}</Text></Link> 
+            <Link to={`/event/${event.id}`}>
             <Text><strong>Categories:</strong>
               {' '}
               {event.categoryIds
@@ -149,7 +167,7 @@ const EventsPage = () => {
                   return category ? category.name : '';
                 })
                 .join(', ')}
-            </Text>{' '}
+            </Text>{' '}</Link>
           </div>
         ))}
       </div>
