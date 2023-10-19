@@ -17,7 +17,7 @@ export const EventPage = () => {
     // Function to fetch event data based on the eventId
     async function fetchEvent() {
       try {
-        const response = await fetch('/events.json'); // Adjust the path as needed.
+        const response = await fetch('/events.json');
     if (!response.ok) {
       throw new Error('Failed to fetch event data');
     }
