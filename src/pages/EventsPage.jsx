@@ -23,25 +23,32 @@ const EventsPage = () => {
   useEffect(() => {
     async function fetchDataFromServer() {
       try {
-        const response = await fetch('/events.json');
-        if (!response.ok) {
-          throw new Error('Failed to fetch data from the server');
+        const eventsResponse = await fetch(`http://localhost:3000/events`);
+        if (!eventsResponse.ok) {
+          throw new Error('Failed to fetch events data from the server');
         }
-        const data = await response.json();
-        setEvents(data.events);
-        setCategories(data.categories);
+        const eventsData = await eventsResponse.json();
+        setEvents(eventsData);
+  
+        const categoriesResponse = await fetch(`http://localhost:3000/categories`);
+        if (!categoriesResponse.ok) {
+          throw new Error('Failed to fetch categories data from the server');
+        }
+        const categoriesData = await categoriesResponse.json();
+        setCategories(categoriesData);
       } catch (error) {
         console.error(error);
       }
     }
-    
+  
     fetchDataFromServer();
   }, []);
+  
     
   // Function to add a new event to the server.
   const addEvent = async () => {
     try {
-      const response = await fetch('/events.json', {
+      const response = await fetch(`http://localhost:3000/events`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,13 +101,17 @@ const filteredEvents = events.filter((event) => {
 
       {/* Form to add a new event */}
         <h2><strong>Add New Event</strong></h2>
+        <div>
         <Input 
           type="text"
           placeholder="Event Title"
           value={newEvent.title}
           onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-          style={{ width: '200px', margin: '10px', padding: '10px' }} 
+          style={{ width: '200px', margin: '10px 0', padding: '10px' }} 
         />
+        </div>
+
+        <div>
         <Input  
           type="text"
           placeholder="Description"
@@ -108,8 +119,55 @@ const filteredEvents = events.filter((event) => {
           onChange={(e) =>
             setNewEvent({ ...newEvent, description: e.target.value })
           }
-          style={{ width: '200px', padding: '10px' }}
+          style={{ width: '200px', margin: '10px 0', padding: '10px' }}
         />
+        </div>
+
+        <div>
+        <Input  
+        type="text"
+        placeholder="Image URL" 
+        value={newEvent.image}
+        onChange={(e) =>
+          setNewEvent({ ...newEvent, image: e.target.value })
+        }
+        style={{ width: '200px', margin: '10px 0', padding: '10px' }}
+      />
+      </div>
+
+      <div>
+      <Input  
+        type="text"
+        placeholder="Start Time" 
+        value={newEvent.startTime}
+        onChange={(e) =>
+          setNewEvent({ ...newEvent, startTime: e.target.value })
+        }
+        style={{ width: '200px', margin: '10px 0', padding: '10px' }}
+      />
+      </div>
+
+      <div>
+      <Input  
+        type="text"
+        placeholder="End Time" 
+        value={newEvent.endTime}
+        onChange={(e) =>
+          setNewEvent({ ...newEvent, endTime: e.target.value })
+        }
+        style={{ width: '200px', margin: '10px 0', padding: '10px' }}
+        />
+        </div>
+
+        <div>
+        <Input
+          type="text"
+          placeholder="Categories"
+          value={newEvent.categories}
+          onChange={(e) => setNewEvent({ ...newEvent, categories: e.target.value })}
+          style={{ width: '200px', margin: '10px 0', padding: '10px' }}
+        />
+      </div>
         
         <Button colorScheme="blue" bg="rgb(7, 79, 106)" borderRadius="5px"
         ml='4' mt="8"  mb="10" onClick={addEvent}>
@@ -161,7 +219,7 @@ const filteredEvents = events.filter((event) => {
             <Link to={`/event/${event.id}`}>
             <Text><strong>Categories:</strong>
               {' '}
-              {event.categoryIds
+              {(event.categoryIds || []) 
                 .map((categoryId) => {
                   const category = categories.find((cat) => cat.id === categoryId);
                   return category ? category.name : '';
