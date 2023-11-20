@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Heading, Text, Image, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, useToast } from '@chakra-ui/react';
+import { Heading, Text, Image, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, useDisclosure, useToast } from '@chakra-ui/react';
 import { Link, useParams, useNavigate,  } from 'react-router-dom';
 import { EditForm } from '../components/EditForm';
 import eventsData from '/events.json';
@@ -17,16 +17,16 @@ export const EventPage = () => {
     // Function to fetch event data based on the eventId
     async function fetchEvent() {
       try {
-        const response = await fetch('/events.json');
-    if (!response.ok) {
+        const response = await fetch(`http://localhost:3000/events/${eventId}`);
+        if (!response.ok) {
       throw new Error('Failed to fetch event data');
     }
-    const eventData = await response.json();
-    const event = eventData.events.find((e) => e.id === parseInt(eventId));
-    setEvent(event);
-
+       // Parse the response and update the state
+      const eventData = await response.json();
+      setEvent(eventData);
       } catch (error) {
         console.error('Error fetching event:', error);
+        throw error;
       }
     }
 
@@ -139,12 +139,6 @@ export const EventPage = () => {
             {/* Include the EditForm component */}
             <EditForm event={event} onSave={handleSave} onCancel={onClose} />
           </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="blue" bg="rgb(7, 79, 106)" style={{ marginRight: '10px' }}  onClick={() => handleSave(event)}>
-              Save
-            </Button>
-            <Button onClick={onClose}>Cancel</Button>
-          </ModalFooter>
         </ModalContent>
       </Modal>
     </div>
